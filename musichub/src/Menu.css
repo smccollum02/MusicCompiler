@@ -1,0 +1,47 @@
+.App .Header, .App .Main {
+    transition-property: 'opacity';
+    transition-duration: 300ms;
+    opacity: 1;
+}
+.App.Menu .Header, .App.Menu .Main {
+    opacity: 0.5;
+}
+.App .Menu {
+    width: 0%;
+    left: 50%;
+    transition-property: 'width, left';
+    transition-duration: 200ms;
+}
+.App.Menu .Menu {
+    position: absolute;
+    left: 30%;
+    bottom: 40%;
+    height: fit-content;
+    background-color: rgb(59, 57, 50);
+    color: rgb(236, 224, 206);
+    width: 40%;
+    border-radius: 10px;
+    padding: 15px;
+}
+.App .Menu-Container {
+    transition-property: 'opacity';
+    transition-duration: 250ms;
+    transition-delay: 200ms;
+    opacity: 0;
+}
+.App.Menu .Menu-Container {
+    opacity: 1;
+}
+.App.Menu .Menu .Title {
+    height: 30px;
+    line-height: 30px;
+    font-weight: 500;
+    font-size: 24px;
+    width: 100%;
+}
+.App.Menu .Menu .Content {
+    display: flex;
+}
+.App.Menu .Menu .Buttons {
+    height: 40px;
+}

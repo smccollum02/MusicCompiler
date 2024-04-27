@@ -1,0 +1,170 @@
+div, input {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+input {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(88, 88, 88);
+  border-radius: 5px;
+}
+
+.App {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background-color: rgb(53, 53, 53);
+}
+
+.Header {
+  height: 100px;
+  width: 100vw;
+  background-color: rgb(53, 53, 53);
+}
+
+.Main {
+  background-image: url("./background.jpg");
+  background-size: cover;
+  height: calc(100vh - 100px);
+  width: 100vw;
+  display: flex;
+  overflow: auto;
+}
+
+.Column {
+  width: 300px;
+  height: 100% - 50px;
+  margin: 10px 5px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.Column-Header {
+  color: rgb(236, 224, 206);
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  margin-bottom: 10px;
+}
+
+.Column-Name {
+  height: 40px;
+  line-height: 40px;
+  font-weight: 500;
+  font-size: 28px;
+  width: calc(100% - 30px);
+}
+
+.Column-Input {
+  background-color: rgba(150, 150, 150, 0.411);
+  height: 100%;
+  padding: 0 5px;
+  width: 100%;
+  font-weight: 500;
+  font-size: 28px;
+  color: rgb(236, 224, 206);
+  border-radius: 5px;
+}
+
+.Column-Input:focus {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+.Add-Column {
+  font-size: 28px;
+}
+
+.Add-Column:hover {
+  cursor: pointer;
+}
+
+.Cards-Container {
+  width: 100%;
+  height: calc(100% - 50px);
+  overflow-y: auto;
+  padding: 0 5px;
+}
+
+.Card {
+  width: 100%;
+  height: fit-content;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  background-color: aliceblue;
+}
+
+.Card-Background {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+}
+
+.Card-Background:hover,
+.Add-Card:hover {
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.Add-Card {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(59, 57, 50);
+  color: rgb(148, 148, 148);
+  padding-bottom: 30px;;
+}
+
+.Plus {
+  font-size: 100px;
+  font-weight: 100;
+}
+
+.Card img {
+  height: 200px;
+  width: 100%;
+}
+
+.Card .Title {
+  height: 40px;
+  line-height: 40px;
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(236, 224, 206);
+  background-color: rgb(59, 57, 50);
+  padding: 0 15px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
