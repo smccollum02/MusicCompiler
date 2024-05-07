@@ -7,6 +7,8 @@ const http = require('http')
 const socketIO = require('socket.io')
 const post = require('./post')
 const get = require('./get')
+const objects = require('./dbObjects')
+const db = require("./database")
 
 const SPOTIFY_CLIENT_ID = "4f1990ba39bd4dc7bb507b9788468b93"
 const SPOTIFY_CLIENT_SECRET = "720fa1682876477ea6ced985d1d0d6a7"
@@ -66,8 +68,26 @@ app.get("/GET", async (req, res) => {
     }*/
 })
 
-app.get("/POST", async (req, res) => {
-    
+app.post("/POST", async (req, res) => {
+    const body = req.body
+    const action = req.query.action
+    console.log(action)
+    console.log(body)
+    let resObj = undefined
+    switch (action) {
+        case "Songs":
+            resObj = await post.postSongs(body)
+            break;
+        case "Genres":
+            resObj = await post.postGenres(body)
+            console.log(resObj)
+            break;
+        case "UpdateGenre":
+            resObj = await post.updateGenre(body)
+            console.log(resObj)
+            break;
+    }
+    res.json(resObj)
 })
 
 app.get("/POST_AccessToken", async (req, res) => {
@@ -82,19 +102,32 @@ app.get("/POST_AccessToken", async (req, res) => {
 
 app.get("/SPOTIFY_GetUserSongs", async (req, res) => {
     try {
-        const tracks = await getTopTracks(req.query.TOKEN)
+        let tracks = await getTopTracks(req.query.TOKEN)
+        let retTracks = []
         console.log(tracks)
-        res.json(tracks.map((track) => {
-            return {
-                name: track.name,
-                artists: track.artists.map((artist) => { return { 
-                    id: artist.id, 
-                    name: artist.name,
-                    spotifyID: artist.id
-                }}),
-                spotifyID: track.id
+
+        for (let track of tracks) {
+            let artists = [] 
+            
+            for (const artist of track.artists) {
+                let existingID = await db.getID(`SELECT ID FROM ARTISTS WHERE SPOTIFY_ID = '${artist.id}'`)
+                console.log(existingID)
+                artists.push(new objects.Artist({ 
+                    ID: existingID, 
+                    NAME: artist.name,
+                    SPOTIFY_ID: artist.id
+                }))
             }
-        }))
+
+            retTracks.push(new objects.Song({
+                ID: 0,
+                NAME: track.name,
+                artists: artists,
+                SPOTIFY_ID: track.id
+            }))
+        }
+
+        res.json(retTracks)
     } catch (error) {
         console.error("Error saving token:", error);
         res.status(500).json({ error: "Error saving token" });
@@ -114,7 +147,7 @@ async function fetchWebApi(endpoint, method, token, body) {
   
 async function getTopTracks(token){
     // Endpoint reference : https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
-    return (await fetchWebApi('v1/me/top/tracks?time_range=medium_term&limit=10', 'GET', token)).items;
+    return (await fetchWebApi('v1/me/top/tracks?time_range=medium_term&limit=50', 'GET', token)).items;
 }
 
 const cleanString = function (string) {

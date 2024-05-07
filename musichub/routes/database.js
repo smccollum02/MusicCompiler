@@ -9,9 +9,20 @@ const db = mysql.createConnection({
 
 db.connect()
 
-async function executeQuery (query, callback) {
+async function executeQuery (query) {
     const [rows] = await db.promise().query(query)
-    callback(rows)
+    return rows
 }
 
-module.exports = {executeQuery}
+async function executeQueryGetID (query) {
+    await db.promise().query(query)
+    const [insertIDRes] = await db.promise().query("SELECT LAST_INSERT_ID();")
+    return insertIDRes[0]["LAST_INSERT_ID()"]
+}
+
+async function getID (query) {
+    const [id] = await db.promise().query(query)
+    return id ? id[0] ? id[0].ID ? id[0].ID : 0 : 0 : 0
+}
+
+module.exports = {executeQuery, executeQueryGetID, getID}

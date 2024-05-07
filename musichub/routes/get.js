@@ -1,42 +1,69 @@
 const objects = require("./dbObjects")
 const db = require("./database")
 
-function getSong(id) {
-    const row = db.executeQuery(`SELECT * FROM SONGS WHERE ID = ${id}`, Song)
+async function runConcurrently(functions) {
+    functions = functions.map((funct) => funct())
+
+    Promise.all(functions).then((responses) => {
+        return responses
+    })
+  }
+async function getSong(id) {
+    const row = await db.executeQuery(`SELECT * FROM SONGS WHERE ID = ${id}`)
+    return new objects.Song(row)
+}
+async function getArtists(params) {
+    let artists = []
+    let data = await db.executeQuery(`SELECT * FROM ARTISTS`)
+
+    artists = data.map((artistData) => {
+        console.log(artistData)
+        return new objects.Artist(artistData)
+    })
+    return artists
 }
 async function getSongs(params) {
-    let songs = []
-    const buildSongs = (data) => {
-        console.log(data)
-        songs = data.map((songData) => {
-            console.log(songData)
-            return new objects.Song(songData)
-        })
-    }
-    await db.executeQuery(`SELECT * FROM SONGS`, buildSongs)
-    return songs
+    let songs = {}
+    let artistsDict = {}
+    let data = await db.executeQuery(`SELECT * FROM SONGS`)
+    let relData = await db.executeQuery(`SELECT * FROM REL_ARTIST_SONG`)
+    let artists = await getArtists()
+    data.forEach((songData) => {
+        songs[songData.ID] = new objects.Song(songData)
+    })
+
+    artists.forEach((artist) => {
+        artistsDict[artist.id] = artist
+    })
+
+    console.log(relData)
+    relData.forEach((rel) => {
+        console.log(rel)
+        songs[rel.SONG_ID].artists.push(artistsDict[rel.ARTIST_ID])
+    })
+    
+    return Object.values(songs)
 }
 async function getGenres(params) {
     let genres = {}
-    const buildSongs = (data) => {
-        data.forEach((songData) => {
-            if (genres[songData.GENRE_ID]) {
-                genres[songData.GENRE_ID].push(new objects.Song(songData))
-            }
-            else {
-                genres[songData.GENRE_ID] = [new objects.Song(songData)]
-            }
-        })
-    }
-    const buildGenres = (data) => {
-        data.forEach((genreData) => {
-            genres[genreData.ID] = new objects.Genre(genreData)
-        })
-    }
-    await db.executeQuery(`SELECT * FROM GENRES`, buildGenres)
-    await db.executeQuery(`SELECT * FROM SONGS`, buildSongs)
+    let genreData = await db.executeQuery(`SELECT * FROM GENRES`)
 
-    return genres
+    genreData.forEach((genreData) => {
+        genres[genreData.ID] = new objects.Genre(genreData)
+    })
+
+    let songs = await getSongs()
+
+    console.log(songs)
+
+    songs.forEach((song) => {
+        console.log(song)
+        if (genres[song.genreID]) {
+            genres[song.genreID].songs.push(song)
+        }
+    })
+
+    return Object.values(genres)
 }
 
 module.exports = {getGenres, getSongs, getSong}

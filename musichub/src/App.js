@@ -4,11 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import io from 'socket.io-client'
 import * as API from './API';
 import * as Objects from  './objects'
+import * as Util from './Util'
+import * as Menu from './Menu'
 
 function App({props}) {
-  const addGenre = useRef()
-  const addSong = useRef()
-  
   const [genreList, setGenreList] = useState(props.genreList)
   const [token, setToken] = useState(null)
   const [menu, setMenu] = useState(null)
@@ -30,28 +29,24 @@ function App({props}) {
     window.location.href = url
   }
 
-  const postSongs = (songs) => {
-    API.Post("Songs", {SONGS: songs})
+  const addGenre = async(e) => {
+    await Util.postGenres([{name: "New Genre", songs: []}], (newGenres) => {
+      let newGenreList = [...genreList, ...newGenres]
+      setGenreList(newGenreList)
+    })
   }
 
   const makeColumn = (genre, i) => {
     let propObj = {
       name: genre.name,
-      cards: makeColumnCards(genre.songs),
+      songs: genre.songs,
       add: addGenre,
+      openMenu: openMenu,
       index: i,
-      id: genre.id
+      id: genre.id,
+      token: token
     }
     return <Column key={genre.id} props={propObj}/>;
-  }
-
-  const makeColumnCards = (songs) => {
-    let cardList = [];
-    songs.forEach((song, i) => {
-      cardList.push(<Card key={i} props={song}/>);
-    });
-    cardList.push(<Card key={songs.length} props={{isAdded: true, addSong: addSong}}/>);
-    return cardList;
   }
 
   const makeColumns = (genresArray) => {
@@ -60,6 +55,10 @@ function App({props}) {
       columns.push(makeColumn(genre, i))
     })
     return columns;
+  }
+
+  const openMenu = (props) =>  {
+    setMenu(Menu.create({...props, close: closeMenu}))
   }
 
   const closeMenu = () =>  {
@@ -98,34 +97,6 @@ function App({props}) {
     };
   }, [])
 
-  addGenre.current = (e) => {
-    let newIndex = parseInt(e.target.parentElement.parentElement.dataset.index) + 1
-    Promise.all([API.Post("Genre", {ORDER: newIndex})]).then((response) => { 
-      let genre = new Objects.Genre(response[0])
-      setGenreList((prevList) => {
-        let newList = [...prevList]
-        newList.splice(newIndex, 0, genre)
-        return newList
-      })
-    })
-  }
-
-  addSong.current = () => {
-    Promise.all([API.Spotify(`GetUserSongs?TOKEN=${token}`)]).then((response) => {
-      let topTracks = response
-      console.log(topTracks)
-      const props = {
-        title: "Add Song",
-        type: "add-song",
-        item: topTracks[0],
-        buttons: [],
-        close: closeMenu,
-        callback: postSongs
-      }
-      setMenu(<Menu props={props}></Menu>)
-    })
-  }
-
   return (
     <div className={"App" + (menu ? " Menu" : "")}>
       <div className="Header">{props.headerContent}</div>
@@ -138,6 +109,36 @@ function App({props}) {
 function Column({props}) {
   const [isEditing, setIsEditing] = useState(false);
   const [text, setText] = useState(props.name);
+  const [colSongs, setSongs] = useState(props.songs);
+
+  const addSong = async(genreID) => {
+    const response = await API.Spotify(`GetUserSongs?TOKEN=${props.token}`)
+    let topTracks = response.map((song) => { return new Objects.Song({...song, artists: song.artists.map((artist) => new Objects.Artist(artist)), genreID: genreID})})
+    console.log(topTracks)
+    const Menu = {
+      title: "Add Song",
+      type: "add-song",
+      item: topTracks,
+      buttons: [],
+      callback: async function(songs) {
+        await Util.postSongs(songs, (newSongs) => {
+          let newSongList = [...colSongs, ...newSongs]
+          setSongs(newSongList)
+        })
+      },
+      search: true
+    }
+    props.openMenu(Menu)
+  }
+
+  const makeColumnCards = () => {
+    let cardList = [];
+    colSongs.forEach((song, i) => {
+      cardList.push(<Card key={i} props={{ song: song, genreID: props.id}}/>);
+    });
+    cardList.push(<Card key={props.songs.length} props={{isAdded: true, addSong: addSong, genreID: props.id}}/>);
+    return cardList;
+  }
 
   const handleNameClick = () => {
     setIsEditing(true)
@@ -147,14 +148,14 @@ function Column({props}) {
     setText(e.target.value)
   }
 
-  const handleBlur = () => {
-    API.Post("UpdateGenre?NAME=" + text + "&ID=" + props.id)
+  const handleBlur = async() => {
+    await API.Post("UpdateGenre", {NAME: text, ID: props.id})
     setIsEditing(false)
   }
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = async(e) => {
     if (e.keyCode == 13) {
-      API.Post("UpdateGenre?NAME=" + text + "&ID=" + props.id)
+      await API.Post("UpdateGenre", {NAME: text, ID: props.id})
       setText(e.target.value)
       setIsEditing(false)
     }
@@ -176,32 +177,33 @@ function Column({props}) {
           )}
         </div>
         <div className="Add-Column"
-          onClick={props.add.current}
+          onClick={props.add}
         >+</div>
       </div>
       <div className="Cards-Container">
-        <div className="Cards">{props.cards}</div>
+        <div className="Cards">{makeColumnCards(colSongs)}</div>
       </div>
     </div>
   );
 }
 
 function Card({props}) {
-  
+  let song = props.song
   return (
     <div className="Card">
       {!props.isAdded ? (
       <div className="Card-Background">
-        <img className="CardImg"
-          src={props.imgSrc}
-        />
-        <div className="Title">{props.name}</div>
+        <div className="Play-Button"></div>
+        <div className="Card-Info">
+          <div className="Title">{song.name}</div>
+          <div className="Artist-Name">{song.artists.map((artist) => artist.name).join(", ")}</div>
+        </div>
       </div>
       ) : (
         <div className="Add-Card"
-          onClick={props.addSong.current}
+          onClick={() => {props.addSong(props.genreID)}}
         >
-          <div className="Plus">+</div>
+          +
           <div className="Add-Text">Add New Song</div>
         </div>
       )}
@@ -209,33 +211,6 @@ function Card({props}) {
   );
 }
 
-function Menu({props}) {
-  const renderSwitchParam = (param) => {
-    switch (props.type) {
-      case "add-song": return <div className="Content"><AddSongContent props={props}></AddSongContent></div>
-    }
-  }
 
-  return (
-    <div className="Menu-Container">
-      <div className="Title" onClick={props.close}>{props.title}</div>
-      {renderSwitchParam(props.type)}
-      <div className="Buttons"></div>
-    </div>
-  )
-}
-
-function AddSongContent({props}) {
-  const songs = props.item
-  const songComps = []
-  songs.forEach((song) => {
-    songComps.push(<div className='Add-Song-Card'>
-                      <dic className='Add-Song-Title' onClick={props.callback([song])}>{song.name}</dic>
-                    </div>)
-  })
-  return (
-    <div className="Menu-Content">{songComps}</div>
-  )
-}
 
 export {App, Column, Card};

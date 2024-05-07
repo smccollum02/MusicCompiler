@@ -15,22 +15,13 @@
 .App.Menu .Menu {
     position: absolute;
     left: 30%;
-    bottom: 40%;
+    bottom: 20%;
     height: fit-content;
     background-color: rgb(59, 57, 50);
     color: rgb(236, 224, 206);
     width: 40%;
     border-radius: 10px;
-    padding: 15px;
-}
-.App .Menu-Container {
-    transition-property: 'opacity';
-    transition-duration: 250ms;
-    transition-delay: 200ms;
-    opacity: 0;
-}
-.App.Menu .Menu-Container {
-    opacity: 1;
+    padding: 15px 15px 5px 15px;
 }
 .App.Menu .Menu .Title {
     height: 30px;
@@ -38,10 +29,93 @@
     font-weight: 500;
     font-size: 24px;
     width: 100%;
+    margin-bottom: 15px;
 }
 .App.Menu .Menu .Content {
     display: flex;
+    width: 100%;
+    height: 400px;
+    overflow-y: scroll;
+}
+.App.Menu .Menu .Content .Menu-Content {
+    width: 100%;
 }
 .App.Menu .Menu .Buttons {
-    height: 40px;
+    height: 55px;
+    display: flex;
+    padding: 10px 0;
 }
+.App.Menu .Menu .Buttons .Left-Buttons {
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+}
+.App.Menu .Menu .Buttons .Button {
+    height: 35px;
+    line-height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    padding: 0 10px;
+    border: 2px solid rgb(87, 85, 74);
+    background-color: rgb(59, 57, 50);
+    transition-property: 'background-color';
+    transition-duration: 200ms;
+}
+.App.Menu .Menu .Buttons .Button:hover {
+    background-color: rgb(85, 83, 75);
+}
+.App.Menu .Menu .Search {
+    height: 50px;
+    margin: 10px 0;
+    padding: 10px 5px;
+    background-color: rgb(47, 47, 51);
+    border-radius: 10px;
+}
+.App.Menu .Menu .Search-Input {
+    height: 30px;
+    padding-left: 5px;
+    font-size: 18px;
+    font-weight: 500;
+    background-color: rgb(47, 47, 51);
+    outline: none;
+    border: transparent;
+    width: 100%;
+    color: rgb(190, 186, 179);
+}
+/*Add Menu ------------- */
+.App.Menu .Menu-Container.add-song .Add-Song-Card {
+    width: 100%;
+    height: fit-content;
+    margin-bottom: 5px;
+    background-color: rgb(44, 43, 38);
+    transition-property: 'background-color';
+    transition-duration: 200ms;
+    display: flex;
+    flex-flow: column;
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+.App.Menu .Menu-Container.add-song .Add-Song-Card:hover {
+    background-color: rgb(63, 62, 54);
+}
+.App.Menu .Menu-Container.add-song .Add-Song-Card .Add-Song-Title {
+    height: 20px;
+    line-height: 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: rgb(236, 224, 206);
+    margin-bottom: 3px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  
+  .App.Menu .Menu-Container.add-song .Add-Song-Card .Add-Song-Artist {
+    height: 15px;
+    line-height: 15px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgb(204, 193, 176);
+  }

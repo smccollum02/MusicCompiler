@@ -1,4 +1,4 @@
-class MusicObj {
+export class MusicObj {
     constructor (data) {
         this.id = data.id
         this.name = data.name
@@ -6,22 +6,24 @@ class MusicObj {
     }
 }
 
-class Song extends MusicObj {
+export class Song extends MusicObj {
+    constructor (data) {
+        super(data)
+        this.artists = data.artists ? data.artists : []
+        this.genreID = data.genreID
+    }
+}
+
+export class Artist extends MusicObj {
     constructor (data) {
         super(data)
     }
 }
 
-class Artist extends MusicObj {
-    constructor (data) {
-        super(data)
-    }
-}
-
-class Genre {
+export class Genre {
     constructor (data) {
         this.id = data.id
         this.name = data.name
-        this.songs = data.songs.map((songData) => { return new Song(songData)})
+        this.songs = data.songs ? data.songs.map((songData) => { return new Song(songData)}) : []
     }
 }

@@ -45,8 +45,8 @@ input {
 }
 
 .Column {
-  width: 300px;
-  height: 100% - 50px;
+  width: 400px;
+  height: calc(100% - 50px);
   margin: 10px 5px;
   border-radius: 10px;
   flex-shrink: 0;
@@ -113,7 +113,23 @@ input {
   height: 100%;
   width: 100%;
   display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: rgb(59, 57, 50);
+}
+
+.Card-Info {
+  display: flex;
   flex-flow: column;
+  width: calc(100% - 30px);
+}
+
+.Play-Button {
+  border-top: 7px solid rgb(59, 57, 50);
+  border-bottom: 7px solid rgb(59, 57, 50);
+  border-left: 12px solid rgb(236, 224, 206);
+  height: 0px;
+  cursor: pointer;
 }
 
 .Card-Background:hover,
@@ -123,34 +139,47 @@ input {
 }
 
 .Add-Card {
-  height: 100%;
+  height: fit-content;
   width: 100%;
   display: flex;
-  flex-flow: column;
-  justify-content: center;
   align-items: center;
   background-color: rgb(59, 57, 50);
   color: rgb(148, 148, 148);
-  padding-bottom: 30px;;
+  padding: 10px 15px;
+}
+
+.Add-Text {
+  height: 40px;
+  line-height: 40px;
+  margin-left: 15px;
 }
 
 .Plus {
-  font-size: 100px;
-  font-weight: 100;
-}
-
-.Card img {
-  height: 200px;
-  width: 100%;
+  font-size: 40px;
+  line-height: 40px;
+  font-weight: 600;
+  height: 35px;
 }
 
 .Card .Title {
-  height: 40px;
-  line-height: 40px;
+  height: 20px;
+  line-height: 20px;
   font-size: 18px;
   font-weight: 500;
   color: rgb(236, 224, 206);
-  background-color: rgb(59, 57, 50);
+  padding: 0 15px;
+  margin-bottom: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.Card .Artist-Name {
+  height: 15px;
+  line-height: 15px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgb(204, 193, 176);
   padding: 0 15px;
 }
 
