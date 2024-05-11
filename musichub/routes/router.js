@@ -78,6 +78,9 @@ app.post("/POST", async (req, res) => {
         case "Songs":
             resObj = await post.postSongs(body)
             break;
+        case "DeleteSong":
+            resObj = await post.deleteSong(body)
+            break;
         case "Genres":
             resObj = await post.postGenres(body)
             console.log(resObj)
@@ -134,6 +137,40 @@ app.get("/SPOTIFY_GetUserSongs", async (req, res) => {
     }
 })
 
+app.get("/SPOTIFY_SearchSongsByName", async (req, res) => {
+    try {
+        console.log(req.query.NAME)
+        let tracks = await searchTrackByName(req.query.TOKEN, req.query.NAME.replace(/ /g, "+"))
+        let retTracks = []
+        console.log(tracks)
+
+        for (let track of tracks) {
+            let artists = [] 
+            
+            for (const artist of track.artists) {
+                let existingID = await db.getID(`SELECT ID FROM ARTISTS WHERE SPOTIFY_ID = '${artist.id}'`)
+                artists.push(new objects.Artist({ 
+                    ID: existingID, 
+                    NAME: artist.name,
+                    SPOTIFY_ID: artist.id
+                }))
+            }
+
+            retTracks.push(new objects.Song({
+                ID: 0,
+                NAME: track.name,
+                artists: artists,
+                SPOTIFY_ID: track.id
+            }))
+        }
+
+        res.json(retTracks)
+    } catch (error) {
+        console.error("Error saving token:", error);
+        res.status(500).json({ error: "Error saving token" });
+    }
+})
+
 async function fetchWebApi(endpoint, method, token, body) {
     const res = await fetch(`https://api.spotify.com/${endpoint}`, {
       headers: {
@@ -148,6 +185,11 @@ async function fetchWebApi(endpoint, method, token, body) {
 async function getTopTracks(token){
     // Endpoint reference : https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
     return (await fetchWebApi('v1/me/top/tracks?time_range=medium_term&limit=50', 'GET', token)).items;
+}
+
+async function searchTrackByName(token, name) {
+    console.log(name)
+    return (await fetchWebApi('v1/search?q=' + name + '&type=track&limit=50', 'GET', token)).tracks.items;
 }
 
 const cleanString = function (string) {

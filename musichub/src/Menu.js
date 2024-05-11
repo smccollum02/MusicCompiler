@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import * as API from './API.js'
+import * as Objects from './objects.js'
 
 function Menu({props}) {
     const [text, setText] = useState("");
@@ -52,6 +54,18 @@ function Menu({props}) {
         buttons.push(<Button props={closeProps}></Button>)
         return buttons
     }
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(async () => {
+            if (text !== "") {
+                const response = await API.Spotify(`SearchSongsByName?TOKEN=${props.token}&NAME=${text}`)
+                let topTracks = response.map((song) => { return new Objects.Song({...song, artists: song.artists.map((artist) => new Objects.Artist(artist)), genreID: props.genreID})})
+                setProperties({...properties, item: topTracks})
+            }
+        }, 3000)
+    
+        return () => clearTimeout(delayDebounceFn)
+      }, [text])
 
     return (
         <div className={`Menu-Container ${props.type}`}>

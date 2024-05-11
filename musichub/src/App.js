@@ -126,15 +126,25 @@ function Column({props}) {
           setSongs(newSongList)
         })
       },
-      search: true
+      search: true,
+      genreID: genreID,
+      token: props.token
     }
     props.openMenu(Menu)
+  }
+
+  const deleteSong = async(songID) => {
+    const response = await API.Post(`DeleteSong`, {SONG_ID: songID})
+    if (response) {
+      let newSongList = colSongs.filter((song) => { return songID !== song.id })
+      setSongs(newSongList)
+    }
   }
 
   const makeColumnCards = () => {
     let cardList = [];
     colSongs.forEach((song, i) => {
-      cardList.push(<Card key={i} props={{ song: song, genreID: props.id}}/>);
+      cardList.push(<Card key={i} props={{ delete: deleteSong, song: song, genreID: props.id}}/>);
     });
     cardList.push(<Card key={props.songs.length} props={{isAdded: true, addSong: addSong, genreID: props.id}}/>);
     return cardList;
@@ -198,6 +208,9 @@ function Card({props}) {
           <div className="Title">{song.name}</div>
           <div className="Artist-Name">{song.artists.map((artist) => artist.name).join(", ")}</div>
         </div>
+        <div className="Delete-Button"
+          onClick={() => {props.delete(props.song.id)}}
+        >&minus;</div>
       </div>
       ) : (
         <div className="Add-Card"

@@ -22,6 +22,13 @@ async function postSongs(params) {
     console.log(songs)
     return songs
 }
+async function deleteSong(params) {
+    let songID = params.SONG_ID
+    await db.executeQuery(`DELETE FROM SONGS WHERE ID=${songID}`)
+    await db.executeQuery(`DELETE FROM REL_ARTIST_SONG WHERE SONG_ID=${songID}`)
+
+    return true
+}
 async function postGenres(params) {
     let genres = params
     for (const genre of genres) {
@@ -39,4 +46,4 @@ async function updateGenre(params) {
     return true
 }
 
-module.exports = {postGenres, updateGenre, postSongs, postArtists}
+module.exports = {postGenres, updateGenre, deleteSong, postSongs, postArtists}

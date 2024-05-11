@@ -132,6 +132,13 @@ input {
   cursor: pointer;
 }
 
+.Delete-Button {
+  color: rgb(236, 224, 206);
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+}
+
 .Card-Background:hover,
 .Add-Card:hover {
   opacity: 0.9;
@@ -162,8 +169,8 @@ input {
 }
 
 .Card .Title {
-  height: 20px;
-  line-height: 20px;
+  height: 22px;
+  line-height: 22px;
   font-size: 18px;
   font-weight: 500;
   color: rgb(236, 224, 206);
