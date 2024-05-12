@@ -224,6 +224,54 @@ function Card({props}) {
   );
 }
 
+function WebPlayback(props) {
+  const [player, setPlayer] = useState(undefined);
+  const [isPaused, setPaused] = useState(false);
+  const [isActive, setActive] = useState(false);
+  const [currTrack, setTrack] = useState(track);
 
+  useEffect(() => {
+
+    const deviceID = Math.random() * Date.now()
+    const script = document.createElement("script");
+    script.src = "https://sdk.scdn.co/spotify-player.js";
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+
+        const player = new window.Spotify.Player({
+            name: 'Web Playback SDK',
+            getOAuthToken: cb => { cb(props.token); },
+            volume: 0.5
+        });
+
+        setPlayer(player);
+
+        player.addListener('ready', ({ deviceID }) => {
+            console.log('Ready with Device ID', deviceID);
+        });
+
+        player.addListener('not_ready', ({ deviceID }) => {
+            console.log('Device ID has gone offline', deviceID);
+        });
+
+
+        player.connect();
+
+    };
+  }, []);
+
+  return (
+     <>
+       <div className="Playback-Container">
+          <div className="Playback-Wrapper">
+
+           </div>
+       </div>
+     </>
+   );
+}
 
 export {App, Column, Card};
